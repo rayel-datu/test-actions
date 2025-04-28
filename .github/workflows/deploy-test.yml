@@ -21,30 +21,45 @@ jobs:
           fi
 
       - name: Extract Version from pubspec.yaml
-        if: ${{ env.SKIP_DEPLOYMENT }} != 'true'
         run: |
+          if [[ "$SKIP_DEPLOYMENT" == "true" ]]; then
+            echo "Skipping checkout step."
+            exit 0
+          fi
             VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
             echo "VERSION=$VERSION" >> $GITHUB_ENV  # Stores version in environment
 
       - name: Identify triggering branch
-        if: ${{ env.SKIP_DEPLOYMENT }} != 'true'
         run: |
+          if [[ "$SKIP_DEPLOYMENT" == "true" ]]; then
+            echo "Skipping checkout step."
+            exit 0
+          fi
           CURRENT_BRANCH=$(echo $GITHUB_REF | sed -E 's|refs/heads/||')
           echo "CURRENT_BRANCH=$CURRENT_BRANCH" >> $GITHUB_ENV
 
       - name: Checkout triggering branch
-        if: ${{ env.SKIP_DEPLOYMENT }} != 'true'
         run: |
+          if [[ "$SKIP_DEPLOYMENT" == "true" ]]; then
+            echo "Skipping checkout step."
+            exit 0
+          fi
           git checkout $CURRENT_BRANCH
 
       - name: Create and switch to release-test branch
-        if: ${{ env.SKIP_DEPLOYMENT }} != 'true'
         run: |
+          if [[ "$SKIP_DEPLOYMENT" == "true" ]]; then
+            echo "Skipping checkout step."
+            exit 0
+          fi
           git tag release-test/$VERSION
           git push origin release-test/$VERSION
 
       - name: Deploy release-test
-        if: ${{ env.SKIP_DEPLOYMENT }} != 'true'
         run: |
+          if [[ "$SKIP_DEPLOYMENT" == "true" ]]; then
+            echo "Skipping checkout step."
+            exit 0
+          fi
           echo "Deploying release-test/$VERSION..."
           # Add deployment steps here
