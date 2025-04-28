@@ -6,7 +6,7 @@ on:
       - feature/* # Only trigger when commits are pushed
 
 jobs:
-  deploy-stage:
+  deploy-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
