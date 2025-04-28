@@ -11,9 +11,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        
+      - name: Fetch full history
+        run: |
+          git fetch --prune --unshallow
 
       - name: Check for actual commits
         run: |
+          git fetch origin
           COMMIT_COUNT=$(git rev-list --count --first-parent origin/${{ github.ref_name }})
           echo $COMMIT_COUNT
           if [ "$COMMIT_COUNT" -eq 1 ]; then
