@@ -27,7 +27,7 @@ jobs:
 
           # Ensure commit count excludes inherited history from the parent branch
           if [ "$PARENT_BRANCH" != "Unknown" ]; then
-            COMMIT_COUNT=$(git rev-list --count origin/${{ github.ref_name }} ^origin/$PARENT_BRANCH)
+            COMMIT_COUNT=$(git rev-list --count origin/${{ github.ref_name }} ^$PARENT_BRANCH)
           else
             COMMIT_COUNT=$(git rev-list --count origin/${{ github.ref_name }})
           fi
