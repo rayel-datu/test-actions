@@ -3,7 +3,7 @@ name: Deploy Test
 on:
   push:
     branches:
-      - release-stage/* # Only trigger when commits are pushed
+      - feature/* # Only trigger when commits are pushed
 
 jobs:
   deploy-stage:
