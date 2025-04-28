@@ -20,19 +20,18 @@ jobs:
         run: |
           git fetch --prune origin
 
-          # List all remote branches dynamically
-          PARENT_BRANCH=$(git for-each-ref --format='%(refname:short)' refs/remotes/origin | sed 's|^refs/remotes/origin/||' | xargs -I {} git merge-base origin/${{ github.ref_name }} origin/{} | xargs -I {} git name-rev --name-only {} || echo "Unknown")
+          # Check if the branch already exists remotely
+          BRANCH_EXISTS=$(git ls-remote --heads origin "${{ github.ref_name }}" | wc -l)
 
-          echo "Detected Parent Branch: $PARENT_BRANCH"
-
-          # Count commits excluding inherited history from parent branch
-          if [ "$PARENT_BRANCH" != "Unknown" ]; then
-            COMMIT_COUNT=$(git rev-list --count origin/${{ github.ref_name }} ^origin/$PARENT_BRANCH)
-          else
-            COMMIT_COUNT=$(git rev-list --count origin/${{ github.ref_name }})
+          if [ "$BRANCH_EXISTS" -eq 0 ]; then
+            echo "Branch '${{ github.ref_name }}' is new—skipping deployment."
+            exit 0
           fi
 
-          echo "Commit Count for ${{ github.ref_name }} (excluding parent branch $PARENT_BRANCH): $COMMIT_COUNT"
+          # Count only new commits on the feature branch
+          COMMIT_COUNT=$(git rev-list --count origin/${{ github.ref_name }} ^origin/main)
+
+          echo "Commit Count for ${{ github.ref_name }}: $COMMIT_COUNT"
 
           if [ "$COMMIT_COUNT" -le 1 ]; then
             echo "Initial branch push detected—skipping deployment."
