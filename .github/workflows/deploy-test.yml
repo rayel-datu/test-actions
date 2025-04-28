@@ -49,6 +49,7 @@ jobs:
 
       - name: Identify triggering branch
         run: |
+          echo "SKIP_DEPLOYMENT: $SKIP_DEPLOYMENT"
           if [[ "$SKIP_DEPLOYMENT" == "true" ]]; then
             echo "Skipping this step."
             exit 0
