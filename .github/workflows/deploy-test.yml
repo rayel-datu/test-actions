@@ -14,7 +14,8 @@ jobs:
 
       - name: Check for actual commits
         run: |
-          COMMIT_COUNT=$(git rev-list --count origin/${{ github.ref_name }})
+          COMMIT_COUNT=$(git rev-list --count --first-parent origin/${{ github.ref_name }})
+          echo $COMMIT_COUNT
           if [ "$COMMIT_COUNT" -eq 1 ]; then
             echo "Initial branch push detected—skipping deployment."
             echo "SKIP_DEPLOYMENT=true" >> $GITHUB_ENV
