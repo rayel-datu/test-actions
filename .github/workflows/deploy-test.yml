@@ -19,6 +19,10 @@ jobs:
             echo "Initial branch push detected—skipping deployment."
             exit 0
           fi
+      - name: Extract Version from pubspec.yaml
+        run: |
+            VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+            echo "VERSION=$VERSION" >> $GITHUB_ENV  # Stores version in environment
 
       - name: Identify triggering branch
         run: |
