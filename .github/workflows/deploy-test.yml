@@ -20,25 +20,25 @@ jobs:
         run: |
           git fetch --prune origin
 
-          # Find the closest parent branch dynamically
-          PARENT_BRANCH=$(git for-each-ref --format='%(refname:short)' refs/remotes/origin | xargs -I {} git merge-base origin/${{ github.ref_name }} origin/{} | xargs -I {} git name-rev --name-only {} || echo "Unknown")
+          # List all remote branches and find closest parent dynamically
+          PARENT_BRANCH=$(git branch -r --sort=-committerdate | grep -v '\->' | xargs -I {} git merge-base origin/${{ github.ref_name }} origin/{} | xargs -I {} git name-rev --name-only {} || echo "Unknown")
 
           echo "Detected Parent Branch: $PARENT_BRANCH"
 
-          # Correct commit count check without duplicate origins
+          # Ensure commit count excludes inherited history from the parent branch
           if [ "$PARENT_BRANCH" != "Unknown" ]; then
             COMMIT_COUNT=$(git rev-list --count origin/${{ github.ref_name }} ^origin/$PARENT_BRANCH)
           else
             COMMIT_COUNT=$(git rev-list --count origin/${{ github.ref_name }})
           fi
 
-          echo "Commit Count for ${{ github.ref_name }} (excluding parent $PARENT_BRANCH): $COMMIT_COUNT"
+          echo "Commit Count for ${{ github.ref_name }} (excluding parent branch $PARENT_BRANCH): $COMMIT_COUNT"
 
           if [ "$COMMIT_COUNT" -le 1 ]; then
             echo "Initial branch push detected—skipping deployment."
             exit 0
           fi
-          
+
       - name: Extract Version from pubspec.yaml
         run: |
           if [[ "$SKIP_DEPLOYMENT" == "true" ]]; then
