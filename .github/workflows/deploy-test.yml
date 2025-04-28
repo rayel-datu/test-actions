@@ -32,7 +32,7 @@ jobs:
       - name: Identify triggering branch
         run: |
           if [[ "$SKIP_DEPLOYMENT" == "true" ]]; then
-            echo "Skipping checkout step."
+            echo "Skipping this step."
             exit 0
           fi
           CURRENT_BRANCH=$(echo $GITHUB_REF | sed -E 's|refs/heads/||')
@@ -41,7 +41,7 @@ jobs:
       - name: Checkout triggering branch
         run: |
           if [[ "$SKIP_DEPLOYMENT" == "true" ]]; then
-            echo "Skipping checkout step."
+            echo "Skipping this step."
             exit 0
           fi
           git checkout $CURRENT_BRANCH
@@ -49,7 +49,7 @@ jobs:
       - name: Create and switch to release-test branch
         run: |
           if [[ "$SKIP_DEPLOYMENT" == "true" ]]; then
-            echo "Skipping checkout step."
+            echo "Skipping this step."
             exit 0
           fi
           git tag release-test/$VERSION
@@ -58,7 +58,7 @@ jobs:
       - name: Deploy release-test
         run: |
           if [[ "$SKIP_DEPLOYMENT" == "true" ]]; then
-            echo "Skipping checkout step."
+            echo "Skipping this step."
             exit 0
           fi
           echo "Deploying release-test/$VERSION..."
