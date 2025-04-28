@@ -38,7 +38,6 @@ jobs:
             exit 0
           fi
 
-
       - name: Extract Version from pubspec.yaml
         run: |
           if [[ "$SKIP_DEPLOYMENT" == "true" ]]; then
