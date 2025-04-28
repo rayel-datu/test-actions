@@ -17,28 +17,34 @@ jobs:
           COMMIT_COUNT=$(git rev-list --count origin/${{ github.ref_name }})
           if [ "$COMMIT_COUNT" -eq 1 ]; then
             echo "Initial branch push detected—skipping deployment."
-            exit 0
+            echo "SKIP_DEPLOYMENT=true" >> $GITHUB_ENV
           fi
+
       - name: Extract Version from pubspec.yaml
+        if: ${{ env.SKIP_DEPLOYMENT }} != 'true'
         run: |
             VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
             echo "VERSION=$VERSION" >> $GITHUB_ENV  # Stores version in environment
 
       - name: Identify triggering branch
+        if: ${{ env.SKIP_DEPLOYMENT }} != 'true'
         run: |
           CURRENT_BRANCH=$(echo $GITHUB_REF | sed -E 's|refs/heads/||')
           echo "CURRENT_BRANCH=$CURRENT_BRANCH" >> $GITHUB_ENV
 
       - name: Checkout triggering branch
+        if: ${{ env.SKIP_DEPLOYMENT }} != 'true'
         run: |
           git checkout $CURRENT_BRANCH
 
       - name: Create and switch to release-test branch
+        if: ${{ env.SKIP_DEPLOYMENT }} != 'true'
         run: |
           git tag release-test/$VERSION
           git push origin release-test/$VERSION
 
       - name: Deploy release-test
+        if: ${{ env.SKIP_DEPLOYMENT }} != 'true'
         run: |
           echo "Deploying release-test/$VERSION..."
           # Add deployment steps here
