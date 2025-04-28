@@ -1,0 +1,40 @@
+name: Deploy Test
+
+on:
+  push:
+    branches:
+      - release-stage/* # Only trigger when commits are pushed
+
+jobs:
+  deploy-stage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for actual commits
+        run: |
+          COMMIT_COUNT=$(git rev-list --count origin/${{ github.ref_name }})
+          if [ "$COMMIT_COUNT" -eq 1 ]; then
+            echo "Initial branch push detected—skipping deployment."
+            exit 0
+          fi
+
+      - name: Identify triggering branch
+        run: |
+          CURRENT_BRANCH=$(echo $GITHUB_REF | sed -E 's|refs/heads/||')
+          echo "CURRENT_BRANCH=$CURRENT_BRANCH" >> $GITHUB_ENV
+
+      - name: Checkout triggering branch
+        run: |
+          git checkout $CURRENT_BRANCH
+
+      - name: Create and switch to release-stage branch
+        run: |
+          git checkout -b release-stage/$VERSION
+          git push origin release-stage/$VERSION
+
+      - name: Deploy release-stage
+        run: |
+          echo "Deploying release-stage/$VERSION..."
+          # Add deployment steps here
