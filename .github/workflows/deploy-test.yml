@@ -18,12 +18,21 @@ jobs:
 
       - name: Check for actual commits
         run: |
-          git fetch origin
-          COMMIT_COUNT=$(git rev-list --count --first-parent origin/${{ github.ref_name }})
-          echo $COMMIT_COUNT
-          if [ "$COMMIT_COUNT" -eq 1 ]; then
+          git fetch --prune origin
+
+          # Find the closest parent branch dynamically
+          PARENT_BRANCH=$(git for-each-ref --format='%(refname:short)' refs/remotes/origin | xargs -I {} git merge-base origin/${{ github.ref_name }} origin/{} | xargs -I {} git name-rev --name-only {})
+
+          echo "Detected Parent Branch: $PARENT_BRANCH"
+
+          # Count only commits added *after* the parent branch
+          COMMIT_COUNT=$(git rev-list --count origin/${{ github.ref_name }} ^origin/$PARENT_BRANCH)
+
+          echo "Commit Count for ${{ github.ref_name }} (excluding parent $PARENT_BRANCH): $COMMIT_COUNT"
+
+          if [ "$COMMIT_COUNT" -le 1 ]; then
             echo "Initial branch push detected—skipping deployment."
-            echo "SKIP_DEPLOYMENT=true" >> $GITHUB_ENV
+            exit 0
           fi
 
       - name: Extract Version from pubspec.yaml
