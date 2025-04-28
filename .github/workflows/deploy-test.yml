@@ -33,12 +33,12 @@ jobs:
         run: |
           git checkout $CURRENT_BRANCH
 
-      - name: Create and switch to release-stage branch
+      - name: Create and switch to release-test branch
         run: |
-          git checkout -b release-stage/$VERSION
-          git push origin release-stage/$VERSION
+          git tag release-test/$VERSION
+          git push origin release-test/$VERSION
 
-      - name: Deploy release-stage
+      - name: Deploy release-test
         run: |
-          echo "Deploying release-stage/$VERSION..."
+          echo "Deploying release-test/$VERSION..."
           # Add deployment steps here
