@@ -34,6 +34,7 @@ jobs:
           echo "Commit Count for ${{ github.ref_name }}: $COMMIT_COUNT"
 
           if [ "$COMMIT_COUNT" -le 1 ]; then
+            echo "SKIP_DEPLOYMENT=true" >> $GITHUB_ENV
             echo "Initial branch push detected—skipping deployment."
             exit 0
           fi
